@@ -336,33 +336,45 @@ header { padding: 48px 0 0; border-bottom: 1px solid var(--rule); }
   flex: 1;
 }
 
+@keyframes borderGlow {
+  0% { box-shadow: 0 0 6px rgba(232, 58, 46, 0.4), inset 0 0 6px rgba(232, 58, 46, 0.2); }
+  50% { box-shadow: 0 0 22px rgba(232, 58, 46, 0.85), inset 0 0 12px rgba(232, 58, 46, 0.4); }
+  100% { box-shadow: 0 0 6px rgba(232, 58, 46, 0.4), inset 0 0 6px rgba(232, 58, 46, 0.2); }
+}
+
+.glowing-stat {
+  animation: borderGlow 3s infinite ease-in-out;
+}
+
 .case-stat {
   padding: 28px 28px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  min-width: 150px;
+  min-width: 165px;
   background: var(--accent-2);
 }
 
 .case-stat-num {
   font-family: var(--f-display);
-  font-size: 3rem;
+  font-size: 2.8rem;
   color: #fff;
   line-height: 1;
   letter-spacing: 0.03em;
+  transition: opacity 0.25s ease;
 }
 
 .case-stat-label {
   font-size: 0.65rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 500;
   text-align: right;
   margin-top: 4px;
   line-height: 1.4;
+  transition: opacity 0.25s ease;
 }
 
 .case-bottom {
@@ -598,15 +610,15 @@ footer {
       <div class="agg-label">Meetings booked<br>IDPR (7 months)</div>
     </div>
     <div class="agg-item">
-      <div class="agg-num">1M<sup>+</sup></div>
+      <div class="agg-num">3M<sup>+</sup></div>
       <div class="agg-label">Emails sent<br>across clients</div>
     </div>
     <div class="agg-item">
-      <div class="agg-num">6<sup>+</sup></div>
+      <div class="agg-num">8<sup>+</sup></div>
       <div class="agg-label">Verticals<br>covered</div>
     </div>
     <div class="agg-item">
-      <div class="agg-num">8<sup>+</sup></div>
+      <div class="agg-num">10<sup>+</sup></div>
       <div class="agg-label">Active clients<br>managed</div>
     </div>
   </div>
@@ -633,12 +645,13 @@ footer {
         </div>
         <div class="case-desc-wrap">
           <div class="case-desc">
-            Designed technical outbound data infrastructure and managed client acquisition pipelines. Generated over $1.5M in pipeline value by booking 256 qualified meetings over a 7-month period—including 78 meetings in October 2026—for Interdependence PR.
+            Designed technical outbound data infrastructure and managed client acquisition pipelines. Generated over $1.5M in pipeline value by booking 256 qualified meetings over a 7-month period—including 78 meetings in October 2026—for Interdependence PR[cite: 5].
           </div>
         </div>
-        <div class="case-stat" style="background:#e83a2e">
-          <div class="case-stat-num">256</div>
-          <div class="case-stat-label">Meetings<br>booked<br>in 7 months</div>
+        <!-- Dynamic Glowing & Rotating Stat Box -->
+        <div class="case-stat glowing-stat" style="background:#e83a2e;">
+          <div class="case-stat-num" id="idpr-stat-num">78</div>
+          <div class="case-stat-label" id="idpr-stat-label">Meetings<br>booked<br>in October</div>
         </div>
       </div>
       <div class="case-bottom">
@@ -746,7 +759,7 @@ footer {
       <div class="tile-name" style="color:#e83a2e">INTERDEPENDENCE</div>
       <div class="tile-vertical">Public Relations</div>
       <div class="tile-scope">Cold email · List building · Copywriting · Client comms</div>
-      <div class="tile-result" style="color:#e83a2e">256 meetings · 7 months</div>
+      <div class="tile-result" style="color:#e83a2e">256 meetings · 7 months[cite: 5]</div>
       <a class="tile-domain" href="https://interdependence.com" target="_blank" style="color:#e83a2e;border-color:rgba(232,58,46,0.3)">interdependence.com ↗</a>
     </div>
     <div class="client-tile" style="border-top:3px solid #00c9a7;background:linear-gradient(160deg,rgba(0,201,167,0.05) 0%,#fff 60%)">
@@ -803,21 +816,45 @@ footer {
 </div>
 
 <script>
-const imgs = {
-};
+  // Rotate IDPR stat box metrics every 4 seconds between October peak and 7-month total
+  const states = [
+    { num: "78", label: "Meetings<br>booked<br>in October" },
+    { num: "256", label: "Meetings<br>booked<br>in 7 months" }
+  ];
+  let currentState = 0;
 
-function openLightbox(key) {
-  document.getElementById('lightbox-img').src = imgs[key];
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
+  setInterval(() => {
+    currentState = (currentState + 1) % states.length;
+    const numEl = document.getElementById('idpr-stat-num');
+    const labelEl = document.getElementById('idpr-stat-label');
+    
+    if (numEl && labelEl) {
+      numEl.style.opacity = 0;
+      labelEl.style.opacity = 0;
+      
+      setTimeout(() => {
+        numEl.innerHTML = states[currentState].num;
+        labelEl.innerHTML = states[currentState].label;
+        numEl.style.opacity = 1;
+        labelEl.style.opacity = 1;
+      }, 250);
+    }
+  }, 4000);
 
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-}
+  const imgs = {};
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  function openLightbox(key) {
+    document.getElementById('lightbox-img').src = imgs[key];
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 </script>
 </body>
 </html>
